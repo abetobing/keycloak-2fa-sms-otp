@@ -41,22 +41,12 @@
             </div>
 
             <div id="help-didnt-receive" class="notification" style="display:none">
-                ${msg("didntReceive")} <a id="do-resend" href="#">${msg("doResend")}</a>.
+                ${msg("didntReceive")} <a id="" href="${resendLink}">${msg("doResend")}</a>.
             </div>
         </form>
 
 
         <script type="text/javascript">
-            var resend = document.getElementById("do-resend");
-            var form = document.getElementById("kc-form-send-otp");
-            var resendFlag = document.getElementById("kc-resend")
-            resend.onclick = (ev) => {
-                console.log(ev);
-                resendFlag.setAttribute("value", "true");
-                form.submit();
-                return false;
-            }
-
             setTimeout(() => {
                 document.getElementById("help-didnt-receive").style.display = "block";
             }, 10000);
