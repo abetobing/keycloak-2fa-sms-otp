@@ -1,5 +1,7 @@
 package abetobing.keycloak.otp.auth;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.Authenticator;
@@ -15,13 +17,25 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 
 @JBossLog
+@Getter
+@Setter
 public class OtpAuthenticator implements Authenticator {
 
     private static final String MOBILE_NUMBER_FIELD = "mobile_number";
+    private String mobileNumber;
 
     @Override
     public void authenticate(AuthenticationFlowContext context) {
+        UserModel user = context.getUser();
+        mobileNumber = user.getFirstAttribute(MOBILE_NUMBER_FIELD);
+//        if (mobileNumber == null) {
+//            log.error("User has no phone number");
+//            context.getEvent().error("user_has_no_phone_number");
+//            context.success();
+//            return;
+//        }
         // TODO: get user's mobile then send OTP
+        log.infof("Sending OTP to: %s", mobileNumber);
         challenge(context, null);
     }
 
@@ -31,14 +45,6 @@ public class OtpAuthenticator implements Authenticator {
             form.setErrors(List.of(errorMessage));
         }
 
-        UserModel user = context.getUser();
-        String phoneNumber = user.getFirstAttribute(MOBILE_NUMBER_FIELD);
-//        if (phoneNumber == null) {
-//            log.error("User has no phone number");
-//            context.getEvent().error("user_has_no_phone_number");
-//            context.success();
-//            return;
-//        }
         form.setAttribute("maskedPhoneNumber", "081xxxxxxx99");
 
         Response response = form.createForm("otp-form.ftl");
@@ -52,6 +58,12 @@ public class OtpAuthenticator implements Authenticator {
 
         if (form.containsKey("cancel")) {
             context.cancelLogin();
+            return;
+        }
+
+        Boolean isResend = Boolean.parseBoolean(form.getFirst("resend"));
+        if (isResend) {
+            authenticate(context);
             return;
         }
 

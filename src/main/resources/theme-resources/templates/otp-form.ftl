@@ -8,9 +8,10 @@
         <form id="kc-form-send-otp"
               class="box"
               action="${url.loginAction}" method="post">
-                <div class="notification is-info ${properties.kcFormGroupClass!}">
-                    ${msg("otpSentTo",(maskedPhoneNumber!''))}
-                </div>
+
+            <div class="content ${properties.kcFormGroupClass!}">
+                <p>${msg("otpSentTo",(maskedPhoneNumber!''))}</p>
+            </div>
 
             <div class="field ${properties.kcFormGroupClass!}">
                 <label for="otp-input" class="label ${properties.kcLabelClass!}">${msg("otp")}</label>
@@ -33,14 +34,33 @@
                     <input tabindex="5" class="button ${properties.kcButtonClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}"
                            name="cancel" id="kc-login" type="submit"
                            value="${msg("doCancel")}"/>
+                    <input id="kc-resend"
+                            name="resend" type="hidden" value="false" />
                 </div>
-                <p class="help is-success">
-                    ${msg("didntReceive")} <a href="#">${msg("doResend")}</a>
-                </p>
 
+            </div>
+
+            <div id="help-didnt-receive" class="notification" style="display:none">
+                ${msg("didntReceive")} <a id="do-resend" href="#">${msg("doResend")}</a>.
             </div>
         </form>
 
+
+        <script type="text/javascript">
+            var resend = document.getElementById("do-resend");
+            var form = document.getElementById("kc-form-send-otp");
+            var resendFlag = document.getElementById("kc-resend")
+            resend.onclick = (ev) => {
+                console.log(ev);
+                resendFlag.setAttribute("value", "true");
+                form.submit();
+                return false;
+            }
+
+            setTimeout(() => {
+                document.getElementById("help-didnt-receive").style.display = "block";
+            }, 10000);
+        </script>
 
     </#if>
 </@layout.registrationLayout>
